@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: docker.io/library/postgres:16
+    restart: unless-stopped
+    volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: django
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  django:
+    image: ${DJANGO_IMAGE}
+    restart: unless-stopped
+    read_only: true
+    depends_on:
+      - postgres
+    tmpfs:
+      - /tmp
+    volumes:
+      - media:/usr/src/media
+    environment:
+      DATABASE_URL: psql://django:${POSTGRES_PASSWORD}@postgres/django
+      SECRET_KEY: ${SECRET_KEY}
+
+  nginx:
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  media:

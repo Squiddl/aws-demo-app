@@ -1,0 +1,24 @@
+{% extends "bootstrap/base.html" %}
+{% load static %}
+{% block content %}
+<h1>{{ question.question_text }}</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Choice</th>
+            <th scope="col">Votes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for choice in question.choice_set.all %}
+        <tr>
+            <th scope="row">{{ choice.choice_text }}</th>
+            <td>{{ choice.votes }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'polls:detail' question.id %}" class="btn btn-primary">Vote again?</a>
+{% endblock content %}

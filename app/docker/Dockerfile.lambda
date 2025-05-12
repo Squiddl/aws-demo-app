@@ -1,0 +1,16 @@
+FROM python:3.12-slim AS requirements
+WORKDIR /opt/django
+RUN pip install pipenv
+COPY Pipfile .
+COPY Pipfile.lock .
+RUN pipenv requirements --categories prod,default > requirements.txt
+
+#
+# Prepare django project
+#
+FROM public.ecr.aws/lambda/python:3.12
+COPY --from=requirements /opt/django/requirements.txt ${LAMBDA_TASK_ROOT}
+RUN pip install --compile -r requirements.txt
+COPY src/ ${LAMBDA_TASK_ROOT}/
+
+CMD [ "awslambda.manage" ]

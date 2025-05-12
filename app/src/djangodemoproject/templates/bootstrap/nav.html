@@ -1,0 +1,30 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand" href="{% url 'polls:index' %}">
+            Demo App
+        </a>
+        <!-- Toggler/collapsibe Button -->
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar links -->
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{% url 'polls:index' %}">Pools</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{% url 'admin:index' %}">Admin</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,20 @@
+services:
+  nginx:
+    build:
+      context: ..
+      dockerfile: ../Dockerfile
+      target: nginx
+      pull: true
+    ports:
+      - "8080:80"
+
+  django:
+    build:
+      context: ..
+      dockerfile: ../Dockerfile
+      target: gunicorn
+      pull: true
+    env_file:
+      - path: ../.env
+        required: true
+

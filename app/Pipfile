@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[requires]
+python_version = "3.12"
+
+[packages]
+asana = "*"
+requests = "*"
+msal = "<2"
+django = "*"
+django-environ = "*"
+pyyaml = "*"
+psycopg = {extras = ["binary"], version = "*"}
+python-json-logger = "*"
+boto3 = "*"
+
+[dev-packages]
+isort = "*"
+flake8 = "*"
+pyright = "*"
+flake8-bugbear = "*"
+setuptools = "*"
+
+[prod]
+gunicorn = "*"

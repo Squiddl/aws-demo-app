@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <link nonce="{{ request.csp_nonce }}" rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
+        {% block head %}
+        {% endblock head %}
+        <title>
+            {% block title %}
+                Pools App
+            {% endblock title %}
+        </title>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        {% include "bootstrap/nav.html" %}
+        {% block image %}
+        {% endblock image %}
+        <div id="content" class="container">
+            {% block content %}
+            {% endblock content %}
+        </div>
+        <script nonce="{{request.csp_nonce}}" src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+    </body>
+</html>
