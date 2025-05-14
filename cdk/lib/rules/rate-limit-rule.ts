@@ -5,7 +5,7 @@
         priority: 1,
         statement: {
             rateBasedStatement: {
-                limit: 10,
+                limit: 1000,
                 aggregateKeyType: 'IP',
             }
         },
