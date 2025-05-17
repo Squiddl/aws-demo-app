@@ -57,7 +57,6 @@ export class ConfigStack extends Stack {
             "demoapp-elb-certificate",
             {
                 domainName: this.domainName,
-                // TODO-Task4: Use the AWS DNS validation for the Certificate creation
                 validation:
                     aws_certificatemanager.CertificateValidation.fromDns(hostedZone),
                 keyAlgorithm: aws_certificatemanager.KeyAlgorithm.RSA_2048,
