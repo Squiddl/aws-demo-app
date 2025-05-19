@@ -13,7 +13,7 @@ dotenv.config();
 const app = new cdk.App();
 const configStack = new ConfigStack(app, "DemoappConfigStack", {
     hostedZoneId: process.env.HOSTED_ZONE_ID!,
-    zoneName: process.env.HOSTED_ZONE_DOMAIN!,
+    zoneName: process.env.HOSTED_ZONE_NAME!,
     subDomain: process.env.SUBDOMAIN!,
     vpcCidr: process.env.VPC_CIDR!,
     env: {
@@ -47,10 +47,10 @@ const wafStack = new WafStack(app, "DemoappWafStack", {
 });
 
 const hostedZoneStack = new HostedZoneStack(app, "DemoappHostedZoneStack", {
-    zoneName: process.env.HOSTED_ZONE_DOMAIN!,
+    zoneName: process.env.HOSTED_ZONE_NAME!,
     hostedZoneId: process.env.HOSTED_ZONE_ID!,
     subDomain: process.env.SUBDOMAIN!,
-    s3BucketOrigin: demoappStack.s3Origin!,
+    s3Origin: demoappStack.s3Origin!,
     elbOrigin: demoappStack.elbOrigin!,
     webAclId: wafStack.webAcl.attrArn!,
     env: {

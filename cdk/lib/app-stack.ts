@@ -23,6 +23,7 @@ import { Construct } from "constructs";
 import { LambdaInvocation } from "./constructs/lambda-invocation";
 import { ISecurityGroup } from "aws-cdk-lib/aws-ec2";
 import { Platform } from "aws-cdk-lib/aws-ecr-assets";
+import {AssetImage} from "aws-cdk-lib/aws-ecs";
 
 export interface AppStackProps extends StackProps {
     vpc: aws_ec2.IVpc;
@@ -148,7 +149,7 @@ export class AppStack extends Stack {
             }
         );
 
-        const demoappImage = aws_ecs.ContainerImage.fromAsset("../app/", {
+        const demoappImage: AssetImage = aws_ecs.ContainerImage.fromAsset("../app/", {
             platform: aws_ecr_assets.Platform.LINUX_AMD64,
             exclude: ["cdk"],
         });
