@@ -1,0 +1,240 @@
+File: app/src/polls/views.py
+Vulnerability: SQL Injection
+Tool: Amazon CodeGuru Security
+python
+def search_questions(request):
+    query = request.GET.get('q', '')
+    raw_query = "SELECT * FROM polls_question WHERE question_text LIKE '%" + query + "%'"
+    questions = Question.objects.raw(raw_query)
+    return render(request, 'polls/index.html', {'latest_question_list': questions})
+File: app/src/djangodemoproject/settings.py
+Vulnerability: Hardcoded Credentials
+Tool: Amazon CodeGuru Security
+python
+if env.str("DB_HOST", None):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": "postgres.example.com",
+            "PORT": "5432",
+            "NAME": "demoapp",
+            "USER": "django_user",
+            "PASSWORD": "super_secret_db_password123",
+        }
+    }
+File: app/src/polls/views.py
+Vulnerability: Cross-Site Scripting (XSS)
+Tool: Amazon CodeGuru Security
+python
+from django.http import HttpResponse
+
+def display_user_input(request):
+    username = request.GET.get('username', '')
+    return HttpResponse(f"<h1>Welcome, {username}!</h1><p>Your vote has been counted.</p>")
+
+File: app/src/polls/views.py
+Vulnerability: Insecure Deserialization
+Tool: Amazon CodeGuru Security
+python
+import pickle
+import base64
+from django.http import JsonResponse
+
+def load_user_preferences(request):
+    serialized_data = request.COOKIES.get('user_prefs', '')
+    if serialized_data:
+        try:
+            user_prefs = pickle.loads(base64.b64decode(serialized_data))
+            return JsonResponse(user_prefs)
+        except:
+            return JsonResponse({})
+    return JsonResponse({})
+File: app/src/polls/views.py
+Vulnerability: Command Injection
+Tool: AWS GuardHooks Security
+python
+import subprocess
+from django.http import HttpResponse
+
+def check_server(request):
+    hostname = request.GET.get('host', 'localhost')
+    result = subprocess.check_output(f"ping -c 1 {hostname}", shell=True)
+    return HttpResponse(f"<pre>{result.decode()}</pre>")
+File: app/src/polls/views.py
+Vulnerability: Insecure API Access
+Tool: AWS GuardHooks Security
+python
+import boto3
+from django.http import HttpResponse
+
+def get_s3_file(request):
+    bucket = request.GET.get('bucket', '')
+    key = request.GET.get('key', '')
+
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.get_object(Bucket=bucket, Key=key)
+        data = response['Body'].read()
+        return HttpResponse(data)
+    except Exception as e:
+        return HttpResponse(f"Error: {str(e)}")
+File: app/Pipfile
+Vulnerability: Outdated Dependencies
+Tool: Amazon Inspector
+python
+[packages]
+asana = "*"
+requests = "2.24.0"
+msal = "<2"
+django = "2.2.20"
+django-environ = "*"
+pyyaml = "5.1"
+psycopg = {extras = ["binary"], version = "*"}
+python-json-logger = "*"
+boto3 = "*"
+File: app/src/polls/views.py
+Vulnerability: Path Traversal
+Tool: AWS GuardHooks Security
+python
+import os
+from django.http import HttpResponse
+
+def view_file(request):
+    filename = request.GET.get('filename', '')
+    file_path = os.path.join('/var/data', filename)
+
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+        return HttpResponse(f"<pre>{content}</pre>")
+    except Exception as e:
+        return HttpResponse(f"Error: {str(e)}")
+File: app/src/polls/views.py
+Vulnerability: Insecure Network Connections
+Tool: AWS GuardHooks Security
+python
+import socket
+from django.http import JsonResponse
+
+def check_port(request):
+    host = request.GET.get('host', 'localhost')
+    port = int(request.GET.get('port', '80'))
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(2)
+    result = sock.connect_ex((host, port))
+    sock.close()
+
+    return JsonResponse({'port_open': result == 0})
+File: app/src/polls/views.py
+Vulnerability: CSRF Protection Bypass
+Tool: Amazon CodeGuru Security
+python
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+@csrf_exempt
+def update_profile(request):
+    if request.method == 'POST':
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        return JsonResponse({'status': 'success', 'name': name, 'email': email})
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+File: cdk/lib/db-stack.ts
+Vulnerability: Insecure Database Configuration
+Tool: Amazon Inspector
+typescript
+const database = new aws_rds.DatabaseInstance(
+  this,
+  "demoapp-database-rds",
+  {
+    databaseName: "demoapp",
+    vpc: props.vpc,
+    vpcSubnets: {
+      subnetType: aws_ec2.SubnetType.PRIVATE_ISOLATED,
+    },
+    storageEncrypted: false,
+    backupRetention: cdk.Duration.days(0),
+    deletionProtection: false,
+    publiclyAccessible: true,
+  }
+);
+File: cdk/lib/app-stack.ts
+Vulnerability: Overly Permissive Security Group
+Tool: Amazon Inspector
+typescript
+const demoappSecurityGroup = new aws_ec2.SecurityGroup(this, "demoapp-sg", {
+  vpc: props.vpc,
+  allowAllOutbound: true,
+  description: "Development environment security group",
+});
+
+demoappSecurityGroup.addIngressRule(
+  aws_ec2.Peer.anyIpv4(),
+  aws_ec2.Port.allTraffic(),
+  'Allow all for development'
+);
+File: cdk/lib/app-stack.ts
+Vulnerability: Insecure Lambda Configuration
+Tool: Amazon Inspector
+typescript
+const managePyLambda = new aws_lambda.DockerImageFunction(
+  this,
+  "manage-py-lambda",
+  {
+    code: aws_lambda.DockerImageCode.fromImageAsset("../app", {
+      file: "docker/Dockerfile.lambda",
+      platform: Platform.LINUX_AMD64,
+    }),
+    timeout: Duration.minutes(10),
+    memorySize: 1024,
+    retryAttempts: 2,
+    environment: {
+      DEBUG: "True",
+      ALLOWED_HOSTS: "*",
+      APP_SECRET_NAME: props.appSecrets.secretName,
+      DB_SECRET_NAME: props.dbSecrets.secretName,
+      DB_PASSWORD: "super_secret_db_password123",
+    },
+    logRetention: aws_logs.RetentionDays.ONE_DAY,
+  });
+File: cdk/lib/app-stack.ts
+Vulnerability: Insecure ECS Configuration
+Tool: Amazon Inspector
+typescript
+const demoappService = new aws_ecs_patterns.ApplicationLoadBalancedFargateService(
+  this,
+  "demoapp-service",
+  {
+    vpc: props.vpc,
+    securityGroups: [demoappSecurityGroup],
+    certificate: props.certificate,
+    protocol: aws_elasticloadbalancingv2.ApplicationProtocol.HTTPS,
+    publicLoadBalancer: true,
+    cpu: 512,
+    memoryLimitMiB: 1024,
+    assignPublicIp: true,
+    taskImageOptions: {
+      image: demoappImage,
+      environment: {
+        DEBUG: "True",
+        ALLOWED_HOSTS: "*",
+        SECRET_KEY: "this_is_not_very_secure_and_should_be_changed",
+      },
+      enableLogging: false,
+    },
+    healthCheckGracePeriod: Duration.seconds(10),
+  }
+);
+File: app/Dockerfile
+Vulnerability: Running Container as Root
+Tool: Amazon Inspector
+dockerfile
+FROM django AS gunicorn
+
+COPY docker/gunicorn.conf.py .
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV SECRET_KEY="insecure_hard_coded_secret_key_in_container"
+CMD ["gunicorn", "wsgi"]
+EXPOSE 8000/tcp
